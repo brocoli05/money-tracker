@@ -1,6 +1,7 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
+import axios from "axios";
 
 function App() {
   const [name, setName] = useState("");
@@ -45,24 +46,25 @@ function App() {
     });
   }
 
-  function deleteTransaction(id) {
-    const url = process.env.REACT_APP_API_URL + `/transaction/${id}`;
+  async function deleteTransaction(id) {
+    const url = `${process.env.REACT_APP_API_URL}/transactions/${id}`;
 
-    fetch(url, {
-      method: "DELETE",
-    })
-      .then((response) => {
-        if (response.ok) {
-          setTransactions((prevTransactions) =>
-            prevTransactions.filter((transaction) => transaction._id !== id)
-          );
-        } else {
-          console.error("Failed to delete transaction");
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to delete transaction: ", err);
-      });
+    try {
+      const response = await axios.delete(url);
+
+      if (response.status === 200) {
+        setTransactions((prevTransactions) =>
+          prevTransactions.filter((transaction) => transaction._id !== id)
+        );
+      } else {
+        console.error(
+          "Failed to delete transaction. Unexpected status: ",
+          response.status
+        );
+      }
+    } catch (err) {
+      console.error("Failed to delete transaction: ", err);
+    }
   }
 
   let balance = 0;

@@ -34,23 +34,13 @@ app.get("/api/transactions", async (req, res) => {
 
 app.delete("/api/transactions/:id", async (req, res) => {
   try {
-    await mongoose.connect(process.env.MONGO_URL);
-    const { id } = req.params;
-    console.log(req.params);
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "Invalid Transaction ID" });
+    const result = await Transaction.deleteOne({ _id: req.params.id });
+    console.log(result);
+    if (result.deletedCount === 1) {
+      res.status(200).json({ status: "Ok", data: "Deleted" });
+    } else {
+      res.status(404).json({ error: "Transaction not found" });
     }
-
-    const deletedTransaction = await Transaction.findByIdAndDelete(id);
-
-    if (!deletedTransaction) {
-      return res.status(404).json({ error: "Transaction not found" });
-    }
-
-    const transactions = await Transaction.find();
-
-    res.json(transactions);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
