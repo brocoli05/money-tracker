@@ -41,6 +41,7 @@ function App() {
         setName("");
         setDatetime("");
         setDescription("");
+        setSearch(""); // clear search field
         console.log("result", json);
       });
     });
@@ -77,6 +78,10 @@ function App() {
   balance = balance.toFixed(2);
   const fraction = balance.split(".")[1];
   balance = balance.split(".")[0];
+
+  const filteredTransactions = transactions.filter((transaction) =>
+    transaction.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div>
@@ -118,8 +123,8 @@ function App() {
           <button type="submit">Add new transaction</button>
         </form>
         <div className="transactions">
-          {transactions.length > 0 &&
-            transactions.map((transaction) => {
+          {filteredTransactions.length > 0 &&
+            filteredTransactions.map((transaction) => {
               return (
                 <div className="transaction" key={transaction._id}>
                   <div className="left">
